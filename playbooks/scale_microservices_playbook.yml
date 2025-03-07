@@ -1,0 +1,25 @@
+- name: Scale or delete microservices in Kubernetes
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+    - name: Set kubeconfig path
+      set_fact:
+        kubeconfig_path: "{{ lookup('env', 'HOME') }}/.kube/config"
+      
+    - name: Debug kubeconfig path
+      debug:
+        msg: "Kubeconfig path is {{ kubeconfig_path }}"
+      tags: debug
+
+    - name: Scale a microservice
+      k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        api_version: apps/v1
+        kind: Deployment
+        name: "my-microservice"
+        namespace: "default"
+        definition:
+          spec:
+            replicas: 3
+

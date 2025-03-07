@@ -1,0 +1,33 @@
+---
+- name: Deploy microservices to Kubernetes
+  hosts: k8s_cluster
+  become: no
+  tasks:
+    - name: Check if kubectl is installed
+      command: kubectl version --client
+      register: kubectl_check
+      failed_when: false
+      changed_when: false
+
+    - name: Install kubectl
+      apt:
+        name: kubectl
+        state: present
+      when: kubectl_check.rc != 0
+
+    - name: Apply Kubernetes configurations
+      kubernetes.core.k8s:
+        kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
+        definition: "{{ lookup('file', '/mnt/c/Users/lika2/ansible-k8s-automation/roles/k8s_deploy/files/deployment.yaml') }}"
+        namespace: default 
+    - name: Ensure microservice pods are running
+      kubernetes.core.k8s:
+        kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
+        namespace: "default"
+        state: "present"
+        definition: "{{ lookup('file', '/mnt/c/Users/lika2/ansible-k8s-automation/roles/k8s_deploy/files/service.yaml') }}"
+
+    - name: Install Helm
+      include_role:
+        name: geerlingguy.helm
+

@@ -1,0 +1,15 @@
+---
+- name: Download Helm
+  get_url:
+    url: "https://get.helm.sh/helm-v3.9.0-linux-amd64.tar.gz"
+    dest: "/tmp/helm.tar.gz"
+
+- name: Extract Helm
+  unarchive:
+    src: "/tmp/helm.tar.gz"
+    dest: "/usr/local/bin/"
+    remote_src: yes
+
+- name: Verify Helm installation
+  command: helm version
+

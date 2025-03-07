@@ -1,0 +1,37 @@
+- name: Deploy microservices to Kubernetes
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  vars:
+    ansible_python_interpreter: "/mnt/c/Users/lika2/ansible-k8s-automation/ansible-env/bin/python"
+  tasks:
+    - name: Set kubeconfig path
+      set_fact:
+        kubeconfig_path: "{{ lookup('env', 'HOME') }}/.kube/config"
+
+    - name: Deploy a microservice
+      k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        namespace: "default"
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: "my-microservice"  # Изменено на корректное имя
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: "my-microservice"  # Изменено на корректное имя
+            template:
+              metadata:
+                labels:
+                  app: "my-microservice"  # Изменено на корректное имя
+              spec:
+                containers:
+                  - name: "my-microservice"  # Изменено на корректное имя
+                    image: "my_image:latest"
+                    ports:
+                      - containerPort: 8080
+

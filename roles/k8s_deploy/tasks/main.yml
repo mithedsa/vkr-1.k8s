@@ -1,0 +1,15 @@
+---
+- name: Install kubectl
+  apt:
+    name: kubectl
+    state: present
+
+- name: Debug deployment YAML
+  debug:
+    msg: "{{ lookup('file', role_path + '/files/deployment.yaml') }}"
+
+- name: Apply Kubernetes configuration
+  kubectl:
+    kubeconfig: "/home/mithedsa/.kube/config"
+    state: present
+    definition: "{{ lookup('file', role_path + '/files/deployment.yaml') }}"
