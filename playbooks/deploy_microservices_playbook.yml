@@ -18,20 +18,43 @@
           apiVersion: apps/v1
           kind: Deployment
           metadata:
-            name: "my-microservice"  # Изменено на корректное имя
+            name: "my-microservice"
           spec:
             replicas: 1
             selector:
               matchLabels:
-                app: "my-microservice"  # Изменено на корректное имя
+                app: "my-microservice"
             template:
               metadata:
                 labels:
-                  app: "my-microservice"  # Изменено на корректное имя
+                  app: "my-microservice"
               spec:
                 containers:
-                  - name: "my-microservice"  # Изменено на корректное имя
-                    image: "my_image:latest"
+                  - name: "my-microservice"
+                    image: "my-microservice:latest"
+                    imagePullPolicy: Never
                     ports:
                       - containerPort: 8080
+                    command: ["python"]
+                    args: ["app.py"]
+
+    - name: Expose microservice via NodePort service
+      k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        namespace: "default"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: my-microservice-service
+          spec:
+            selector:
+              app: my-microservice
+            ports:
+              - protocol: TCP
+                port: 8080
+                targetPort: 8080
+                nodePort: 30080
+            type: NodePort
 
